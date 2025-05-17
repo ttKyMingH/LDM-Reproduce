@@ -103,7 +103,7 @@ plt.ylabel("Loss")
 plt.grid()
 plt.legend()
 plt.show()
-plt.savefig(f"./losses/mnist_ldm_cond{time.time()}.png")
+plt.savefig(f"./losses/MS_COCO_ldm_cond{time.time()}.png")
 plt.close()
 
 with open('./results/loss_ldm_cond.txt', 'w') as f:
@@ -126,5 +126,5 @@ for n_row in range(2):
         f_ax.axis("off")
 
 plt.show()
-plt.savefig(f"./results/mnist_ldm_cond{time.time()}.png")
+plt.savefig(f"./results/MS_COCO_ldm_cond{time.time()}.png")
 plt.close()
