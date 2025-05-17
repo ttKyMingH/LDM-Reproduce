@@ -1,0 +1,28 @@
+dataset:
+  name: "romrawinjp/mscoco"
+  cache_dir: "./data"
+  structure:
+    train:
+      features: ["cocoid", "filename", "en", "image"]
+      num_rows: 82783
+    val:
+      features: ["cocoid", "filename", "en", "image"]
+      num_rows: 5000
+    restval:
+      features: ["cocoid", "filename", "en", "image"]
+      num_rows: 30504
+    test:
+      features: ["cocoid", "filename", "en", "image"]
+      num_rows: 5000
+  
+  feature_types:
+    cocoid: "int64"
+    filename: "string"
+    en: "Sequence(string)"
+    image: "Image"
+  
+  sample_format:
+    cocoid: "整数ID"
+    filename: "图像文件名，例如：COCO_train2014_000000057870.jpg"
+    en: "包含多个英文描述的列表"
+    image: "PIL.JpegImagePlugin.JpegImageFile对象，RGB模式"
