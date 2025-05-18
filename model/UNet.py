@@ -66,7 +66,7 @@ class ResBlock(nn.Module):
     def forward(self, x: torch.Tensor, t_emb: torch.Tensor):
         h = self.in_layers(x)
         t_emb = self.time_emb(t_emb)
-        h = h + t_emb[:, :, None, None]
+        h = h + t_emb[:, :, None, None] # [batch_size, out_channels, height, width]
         h = self.out_layer(h)
 
         return self.skip_connection(x) + h
@@ -108,7 +108,7 @@ class UNetModel(nn.Module):
 
         self.input_block = nn.ModuleList()
         self.input_block.append(TimestepEmbedSequential(
-            nn.Conv2d(in_channels, channels, 3, padding=1),
+            nn.Conv2d(in_channels, channels, 3, padding=1, stride=1),
         ))
 
         input_block_channels = [channels]
@@ -170,8 +170,8 @@ class UNetModel(nn.Module):
     def forward(self, x: torch.Tensor, time_steps: torch.Tensor, cond: torch.Tensor):
         x_input_blocks = []
 
-        t_emb = self.time_step_embedding(time_steps)
-        t_emb = self.time_emb(t_emb)
+        t_emb = self.time_step_embedding(time_steps) # [batch_size, 1] -> [batch_size, channels]
+        t_emb = self.time_emb(t_emb) # [batch_size, channels] -> [batch_size, d_time_emb = channels * 4]
 
         for module in self.input_block:
             x = module(x, t_emb, cond)

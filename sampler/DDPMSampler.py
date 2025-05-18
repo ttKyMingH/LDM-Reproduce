@@ -1,15 +1,18 @@
+import os, sys
+sys.path.append(os.getcwd())
+
 import requests
 from PIL import Image
 from matplotlib import pyplot as plt
 from torchvision.transforms import transforms
 from tqdm import tqdm
 
-from pytorch_version.sampler.DiffusionSampler import DiffusionSampler
+from sampler.DiffusionSampler import DiffusionSampler
 import torch
 import torch.nn.functional as F
 import numpy as np
 
-from pytorch_version.LatentDiffusion import LatentDiffusion
+from LatentDiffusion import LatentDiffusion
 
 
 class DDPMSampler(DiffusionSampler):

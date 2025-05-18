@@ -1,5 +1,5 @@
-import sys
-sys.path.append("/root/diffusion")
+import os, sys
+sys.path.append(os.getcwd())
 
 import time
 from matplotlib import pyplot as plt
@@ -13,6 +13,7 @@ from model.UNet import UNetModel
 from LatentDiffusion import LatentDiffusion
 from sampler.DDPMSampler import DDPMSampler
 from model.AutoEncoder import AutoEncoder, Encoder, Decoder
+from model.Context_embedder import ContextEmbedder
 from utils import train_LDM
 
 # 加载配置文件
@@ -43,8 +44,12 @@ os.makedirs(download_dir, exist_ok=True)  # 确保目录存在
 ds = load_dataset(cfg_data.dataset.name, cache_dir=download_dir)
 dataset = ds
 
-dataset = MSCOCOImageDataset(ds, splits=['train'], transform=transform)
-train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+dataset_train = MSCOCOImageDataset(ds, splits=['train'], transform=transform)
+dataset_val = MSCOCOImageDataset(ds, splits=['val'], transform=transform)
+dataset_test = MSCOCOImageDataset(ds, splits=['test'], transform=transform)
+train_loader = torch.utils.data.DataLoader(dataset_train, batch_size=batch_size, shuffle=True)
+val_loader = torch.utils.data.DataLoader(dataset_val, batch_size=batch_size, shuffle=False)
+test_loader = torch.utils.data.DataLoader(dataset_test, batch_size=batch_size, shuffle=False)
 
 unet = UNetModel(
     **cfg.model.unet
@@ -64,14 +69,16 @@ auto_encoder = AutoEncoder(
     **cfg.model.auto_encoder
 )
 
-auto_encoder.load_state_dict(torch.load(vae_model_path))
+cond_encoder = ContextEmbedder(
+    **cfg.model.context_embedder
+)
 
-context_embedder = nn.Identity()
+auto_encoder.load_state_dict(torch.load(vae_model_path))
 
 ldm = LatentDiffusion(
     unet_model=unet,
     auto_encoder=auto_encoder,
-    context_embedder=context_embedder,
+    context_embedder=cond_encoder,
     **cfg.model.ldm
 ).to(device)
 
@@ -83,48 +90,35 @@ ddpm = DDPMSampler(ldm)
 optimizer = torch.optim.AdamW(unet.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
 loss_history = []
+val_loss_history = []
 start_time = time.time()
 
 for epoch in range(epochs):
     print(f"Epoch {epoch + 1}/{epochs}")
+    ldm.train()
     avg_epoch_loss = train_LDM(train_loader, optimizer, ldm, ddpm, d_cond, device)
     loss_history.append(avg_epoch_loss)
+    
+    avg_val_loss = evaluate_LDM(val_loader, ldm, ddpm, d_cond, device)
+    val_loss_history.append(avg_val_loss)
+
     torch.save(unet.state_dict(), model_path)
     print(f"Epoch {epoch + 1} Completed. Average Loss: {avg_epoch_loss:.4f}")
     print("-" * 50)
 
+avg_test_loss = test_LDM(test_loader, ldm, ddpm, d_cond, device)
 print("Training completed!")
 print(f"Total training time: {(time.time() - start_time) / 60:.2f} minutes.")
+print(f"Final test loss: {avg_test_loss:.4f}")
 
 plt.figure(figsize=(10, 6))
 plt.plot(range(1, len(loss_history) + 1), loss_history, marker='o', label="Training Loss")
-plt.title("Training Loss Over Epochs")
+plt.plot(range(1, len(val_loss_history) + 1), val_loss_history, marker='s', label="Validation Loss")
+plt.title("Training Loss and Validation Loss Over Epochs")
+plt.xlabel("Epoch")
 plt.ylabel("Loss")
 plt.grid()
 plt.legend()
 plt.show()
-plt.savefig(f"./losses/MS_COCO_ldm_cond{time.time()}.png")
-plt.close()
-
-with open('./results/loss_ldm_cond.txt', 'w') as f:
-    for i, loss_value in enumerate(loss_history, 1):
-        f.write(f"Step {i}: Loss = {loss_value:.6f}\n")
-
-labels = torch.arange(0, 10, device=device)
-cond = torch.repeat_interleave(labels, d_cond, dim=0).reshape(-1, 1, d_cond).to(torch.float32)
-generated_images = ddpm.sample((10, 1, 8, 8), cond)
-images = auto_encoder.decode(generated_images)
-
-fig = plt.figure(figsize=(8, 8), constrained_layout=True)
-gs = fig.add_gridspec(2, 5)
-
-imgs = images.reshape(2, 5, image_size, image_size).cpu().detach().numpy()
-for n_row in range(2):
-    for n_col in range(5):
-        f_ax = fig.add_subplot(gs[n_row, n_col])
-        f_ax.imshow((imgs[n_row, n_col]), cmap="gray")
-        f_ax.axis("off")
-
-plt.show()
-plt.savefig(f"./results/MS_COCO_ldm_cond{time.time()}.png")
+plt.savefig(f"./losses/MS_COCO_ldm_cond_train_val_{time.time()}.png")
 plt.close()

@@ -1,27 +1,5 @@
 import torch
 
-def train_DDPM(train_loader, optimizer, sampler, d_cond, device):
-    epoch_loss = []
-    for step, (pics, labels) in enumerate(train_loader):
-        pics = pics.to(device)
-        optimizer.zero_grad()
-        if d_cond != 0:
-            cond = torch.repeat_interleave(labels, d_cond, dim=0).reshape(-1, 1, d_cond).to(device).to(torch.float32)
-        else:
-            cond = None
-
-        loss = sampler.loss(pics, cond)
-        loss.backward()
-        optimizer.step()
-
-        epoch_loss.append(loss.item())
-
-        if (step + 1) % 50 == 0:
-            print(f"Step {step + 1}/{len(train_loader)} - Loss: {loss.item():.4f}")
-
-    avg_epoch_loss = torch.tensor(epoch_loss).mean().item()
-    return avg_epoch_loss
-
 def train_VAE(train_loader, optimizer, auto_encoder, loss, device):
     epoch_total_loss = []
     epoch_recon_loss = []
@@ -60,7 +38,7 @@ def train_LDM(train_loader, optimizer, ldm, sampler, d_cond, device):
 
         z = ldm.autoencoder_encode(pics)
         if d_cond != 0:
-            cond = torch.repeat_interleave(labels, d_cond, dim=0).reshape(-1, 1, d_cond).to(device).to(torch.float32)
+            cond = ldm.get_conditioning(labels).reshape(-1, 1, d_cond).to(device).to(torch.float32)
         else:
             cond = None
 
@@ -76,6 +54,40 @@ def train_LDM(train_loader, optimizer, ldm, sampler, d_cond, device):
 
     avg_epoch_loss = torch.tensor(epoch_loss).mean().item()
     return avg_epoch_loss
+
+def evaluate_LDM(val_loader, ldm, sampler, d_cond, device):
+    ldm.eval()
+    with torch.no_grad():
+        val_losses = []
+        for pics, labels in val_loader:
+            pics = pics.to(device)
+            z = ldm.autoencoder_encode(pics)
+            if d_cond!= 0:
+                cond = ldm.get_conditioning(labels).reshape(-1, 1, d_cond).to(device).to(torch.float32)
+            else:
+                cond = None
+            loss = sampler.loss(z, cond)
+            val_losses.append(loss.item())
+        avg_val_loss = torch.tensor(val_losses).mean().item()
+        print(f"Validation Loss: {avg_val_loss:.4f}")
+    return avg_val_loss
+
+def test_LDM(test_loader, ldm, sampler, d_cond, device):
+    ldm.eval()
+    with torch.no_grad():
+        test_losses = []
+        for pics, labels in test_loader:
+            pics = pics.to(device)
+            z = ldm.autoencoder_encode(pics)
+            if d_cond!= 0:
+                cond = ldm.get_conditioning(labels).reshape(-1, 1, d_cond).to(device).to(torch.float32)
+            else:
+                cond = None
+            loss = sampler.loss(z, cond)
+            test_losses.append(loss.item())
+        avg_test_loss = torch.tensor(test_losses).mean().item()
+        print(f"Test Loss: {avg_test_loss:.4f}")
+    return avg_test_loss
 
 from datasets import concatenate_datasets
 from torch.utils.data import Dataset

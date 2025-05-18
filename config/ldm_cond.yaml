@@ -8,7 +8,7 @@ model:
     channel_multipliers: [1,2,2,4,4]  # 32, 16, 8, 4, 2
     n_heads: 8
     tf_layers: 1
-    d_cond: 128
+    d_cond: 384
 
   encoder:
     channels: 128
@@ -41,6 +41,9 @@ model:
     n_steps: 1000
     linear_start: 0.0015
     linear_end: 0.0155
+
+    context_embedder:
+      model_name: 'intfloat/multilingual-e5-small'
 
 training:
   use_cuda: true
