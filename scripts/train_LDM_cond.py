@@ -70,7 +70,7 @@ auto_encoder = AutoEncoder(
 )
 
 cond_encoder = ContextEmbedder(
-    **cfg.model.context_embedder
+    **cfg.model.ldm.context_embedder
 )
 
 auto_encoder.load_state_dict(torch.load(vae_model_path))
