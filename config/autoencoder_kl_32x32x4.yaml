@@ -28,8 +28,8 @@ model:
 training:
   use_cuda: true
   image_size: 256
-  batch_size: 12
-  epochs: 50
+  batch_size: 8
+  epochs: 10
   learning_rate: 4.5e-6
   weight_decay: 4.5e-6
   model_path: './checkpoint/MS_COCO_VAE.pkl'

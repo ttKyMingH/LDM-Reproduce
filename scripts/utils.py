@@ -111,10 +111,18 @@ def train_LDM(train_loader, optimizer, ldm, sampler, d_cond, device):
     for step, (pics, labels) in enumerate(train_loader):
         pics = pics.to(device)
         optimizer.zero_grad()
+        
+        # 检查是否为DataParallel模型，如果是则使用module属性访问原始模型
+        if isinstance(ldm, torch.nn.DataParallel):
+            z = ldm.module.autoencoder_encode(pics)
+        else:
+            z = ldm.autoencoder_encode(pics)
 
-        z = ldm.autoencoder_encode(pics)
         if d_cond != 0:
-            cond = ldm.get_conditioning(labels).reshape(-1, 1, d_cond).to(device).to(torch.float32)
+            if isinstance(ldm, torch.nn.DataParallel):
+                cond = ldm.module.get_conditioning(labels).reshape(-1, 1, d_cond).to(device).to(torch.float32)
+            else:
+                cond = ldm.get_conditioning(labels).reshape(-1, 1, d_cond).to(device).to(torch.float32)
         else:
             cond = None
 
@@ -137,11 +145,21 @@ def evaluate_LDM(val_loader, ldm, sampler, d_cond, device):
         val_losses = []
         for pics, labels in val_loader:
             pics = pics.to(device)
-            z = ldm.autoencoder_encode(pics)
-            if d_cond!= 0:
-                cond = ldm.get_conditioning(labels).reshape(-1, 1, d_cond).to(device).to(torch.float32)
+            
+            # 检查是否为DataParallel模型，如果是则使用module属性访问原始模型
+            if isinstance(ldm, torch.nn.DataParallel):
+                z = ldm.module.autoencoder_encode(pics)
+            else:
+                z = ldm.autoencoder_encode(pics)
+
+            if d_cond != 0:
+                if isinstance(ldm, torch.nn.DataParallel):
+                    cond = ldm.module.get_conditioning(labels).reshape(-1, 1, d_cond).to(device).to(torch.float32)
+                else:
+                    cond = ldm.get_conditioning(labels).reshape(-1, 1, d_cond).to(device).to(torch.float32)
             else:
                 cond = None
+
             loss = sampler.loss(z, cond)
             val_losses.append(loss.item())
         avg_val_loss = torch.tensor(val_losses).mean().item()
@@ -154,11 +172,21 @@ def test_LDM(test_loader, ldm, sampler, d_cond, device):
         test_losses = []
         for pics, labels in test_loader:
             pics = pics.to(device)
-            z = ldm.autoencoder_encode(pics)
-            if d_cond!= 0:
-                cond = ldm.get_conditioning(labels).reshape(-1, 1, d_cond).to(device).to(torch.float32)
+
+            # 检查是否为DataParallel模型，如果是则使用module属性访问原始模型
+            if isinstance(ldm, torch.nn.DataParallel):
+                z = ldm.module.autoencoder_encode(pics)
+            else:
+                z = ldm.autoencoder_encode(pics)
+
+            if d_cond != 0:
+                if isinstance(ldm, torch.nn.DataParallel):
+                    cond = ldm.module.get_conditioning(labels).reshape(-1, 1, d_cond).to(device).to(torch.float32)
+                else:
+                    cond = ldm.get_conditioning(labels).reshape(-1, 1, d_cond).to(device).to(torch.float32)
             else:
                 cond = None
+                
             loss = sampler.loss(z, cond)
             test_losses.append(loss.item())
         avg_test_loss = torch.tensor(test_losses).mean().item()

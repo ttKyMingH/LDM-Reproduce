@@ -20,7 +20,16 @@ from utils import train_LDM
 cfg = OmegaConf.load('./config/ldm_cond.yaml')
 
 # 设置训练参数
-device = "cuda" if torch.cuda.is_available() and cfg.training.use_cuda else "cpu"
+# 修改设备选择，使用CUDA设备0和1
+if torch.cuda.is_available() and cfg.training.use_cuda:
+    # 指定要使用的GPU设备
+    device_ids = [0, 1]  # 使用GPU 0和1
+    device = f"cuda:{device_ids[0]}"  # 主设备设为cuda:0
+    print(f"使用GPU设备: {device_ids}")
+else:
+    device = "cpu"
+    print("使用CPU进行训练")
+
 image_size = cfg.training.image_size
 batch_size = cfg.training.batch_size
 epochs = cfg.training.epochs
@@ -44,9 +53,9 @@ os.makedirs(download_dir, exist_ok=True)  # 确保目录存在
 ds = load_dataset(cfg_data.dataset.name, cache_dir=download_dir)
 dataset = ds
 
-dataset_train = MSCOCOImageDataset(ds, splits=['train'], transform=transform)
-dataset_val = MSCOCOImageDataset(ds, splits=['val'], transform=transform)
-dataset_test = MSCOCOImageDataset(ds, splits=['test'], transform=transform)
+dataset_train = MSCOCOImageDataset(ds, splits=['train'], transform=transform, filter_channels=False, target_size=(image_size, image_size))
+dataset_val = MSCOCOImageDataset(ds, splits=['val'], transform=transform, filter_channels=False, target_size=(image_size, image_size))
+dataset_test = MSCOCOImageDataset(ds, splits=['test'], transform=transform, filter_channels=False, target_size=(image_size, image_size))
 train_loader = torch.utils.data.DataLoader(dataset_train, batch_size=batch_size, shuffle=True)
 val_loader = torch.utils.data.DataLoader(dataset_val, batch_size=batch_size, shuffle=False)
 test_loader = torch.utils.data.DataLoader(dataset_test, batch_size=batch_size, shuffle=False)
@@ -81,6 +90,11 @@ ldm = LatentDiffusion(
     context_embedder=cond_encoder,
     **cfg.model.ldm
 ).to(device)
+
+# 如果使用多GPU，则使用DataParallel包装模型
+if torch.cuda.is_available() and cfg.training.use_cuda and len(device_ids) > 1:
+    ldm = nn.DataParallel(ldm, device_ids=device_ids)
+    print(f"模型已使用DataParallel在{len(device_ids)}个GPU上并行")
 
 if load_model:
     unet.load_state_dict(torch.load(model_path))

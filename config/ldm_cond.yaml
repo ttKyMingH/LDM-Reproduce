@@ -50,7 +50,7 @@ training:
   use_cuda: true
   image_size: 256
   batch_size: 96
-  epochs: 100
+  epochs: 3
   learning_rate: 5.0e-5 
   weight_decay: 5.0e-5 
   model_path: './checkpoint/MS_COCO_cond_LDM.pkl'
