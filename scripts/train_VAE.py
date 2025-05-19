@@ -18,7 +18,16 @@ from datasets import load_dataset
 cfg = OmegaConf.load('./config/autoencoder_kl_32x32x4.yaml')
 
 # 设置训练参数
-device = "cuda:0" if torch.cuda.is_available() and cfg.training.use_cuda else "cpu"
+# 修改设备选择，使用CUDA设备0和1
+if torch.cuda.is_available() and cfg.training.use_cuda:
+    # 指定要使用的GPU设备
+    device_ids = [0, 1]  # 使用GPU 0和1
+    device = f"cuda:{device_ids[0]}"  # 主设备设为cuda:0
+    print(f"使用GPU设备: {device_ids}")
+else:
+    device = "cpu"
+    print("使用CPU进行训练")
+
 image_size = cfg.training.image_size
 batch_size = cfg.training.batch_size
 epochs = cfg.training.epochs
@@ -71,6 +80,11 @@ auto_encoder = AutoEncoder(
     **cfg.model.auto_encoder
 ).to(device)
 
+# 如果使用多GPU，则使用DataParallel包装模型
+if torch.cuda.is_available() and cfg.training.use_cuda and len(device_ids) > 1:
+    auto_encoder = nn.DataParallel(auto_encoder, device_ids=device_ids)
+    print(f"模型已使用DataParallel在{len(device_ids)}个GPU上并行")
+
 if load_model:
     auto_encoder.load_state_dict(torch.load(vae_model_path))
 
@@ -102,7 +116,10 @@ for epoch in range(epochs):
     val_kl_loss_history.append(avg_val_kl_loss)
     
     # 保存模型
-    torch.save(auto_encoder.state_dict(), vae_model_path)
+    if isinstance(auto_encoder, nn.DataParallel):
+        torch.save(auto_encoder.module.state_dict(), vae_model_path)
+    else:
+        torch.save(auto_encoder.state_dict(), vae_model_path)
     
     # 记录训练进度
     with open('./checkpoint/vae_progress.txt', 'w') as f:

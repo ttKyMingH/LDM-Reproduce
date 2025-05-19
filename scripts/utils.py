@@ -13,8 +13,13 @@ def train_VAE(train_loader, optimizer, auto_encoder, loss, device):
         pics = pics.to(device)
         optimizer.zero_grad()
 
-        z = auto_encoder.encode(pics)
-        pics_hat = auto_encoder.decode(z.sample())
+        # 检查是否为DataParallel模型，如果是则使用module属性访问原始模型
+        if isinstance(auto_encoder, torch.nn.DataParallel):
+            z = auto_encoder.module.encode(pics)
+            pics_hat = auto_encoder.module.decode(z.sample())
+        else:
+            z = auto_encoder.encode(pics)
+            pics_hat = auto_encoder.decode(z.sample())
 
         recon_loss, kl_loss = loss(pics, pics_hat, z.mean, z.log_var, 0.5)
         ls = recon_loss + kl_loss
@@ -45,8 +50,13 @@ def evaluate_VAE(val_loader, auto_encoder, loss, device):
             pics, _ = batch
             pics = pics.to(device)
             
-            z = auto_encoder.encode(pics)
-            pics_hat = auto_encoder.decode(z.sample())
+            # 检查是否为DataParallel模型
+            if isinstance(auto_encoder, torch.nn.DataParallel):
+                z = auto_encoder.module.encode(pics)
+                pics_hat = auto_encoder.module.decode(z.sample())
+            else:
+                z = auto_encoder.encode(pics)
+                pics_hat = auto_encoder.decode(z.sample())
             
             recon_loss, kl_loss = loss(pics, pics_hat, z.mean, z.log_var, 0.5)
             ls = recon_loss + kl_loss
@@ -73,8 +83,13 @@ def test_VAE(test_loader, auto_encoder, loss, device):
             pics, _ = batch
             pics = pics.to(device)
             
-            z = auto_encoder.encode(pics)
-            pics_hat = auto_encoder.decode(z.sample())
+            # 检查是否为DataParallel模型
+            if isinstance(auto_encoder, torch.nn.DataParallel):
+                z = auto_encoder.module.encode(pics)
+                pics_hat = auto_encoder.module.decode(z.sample())
+            else:
+                z = auto_encoder.encode(pics)
+                pics_hat = auto_encoder.decode(z.sample())
             
             recon_loss, kl_loss = loss(pics, pics_hat, z.mean, z.log_var, 0.5)
             ls = recon_loss + kl_loss
