@@ -10,7 +10,7 @@ from torch import nn
 from torchvision import datasets, transforms
 
 from model.AutoEncoder import AutoEncoder, Encoder, Decoder, loss
-from utils import train_VAE, MSCOCOImageDataset
+from utils import train_VAE, evaluate_VAE, test_VAE, MSCOCOImageDataset
 
 from datasets import load_dataset
 
@@ -38,10 +38,28 @@ cfg_data = OmegaConf.load('./config/dataset_mscoco.yaml')
 download_dir = cfg_data.dataset.cache_dir
 os.makedirs(download_dir, exist_ok=True)  # 确保目录存在
 ds = load_dataset(cfg_data.dataset.name, cache_dir=download_dir)
-dataset = ds
 
-dataset = MSCOCOImageDataset(ds, splits=['train', 'val', 'test', 'restval'], transform=transform)
-ds_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+# 创建训练集、验证集和测试集
+dataset_train = MSCOCOImageDataset(ds, splits=['train'], transform=transform, filter_channels=False, target_size=(image_size, image_size))
+dataset_val = MSCOCOImageDataset(ds, splits=['val'], transform=transform, filter_channels=False, target_size=(image_size, image_size))
+dataset_test = MSCOCOImageDataset(ds, splits=['test'], transform=transform, filter_channels=False, target_size=(image_size, image_size))
+
+# 创建数据加载器
+train_loader = torch.utils.data.DataLoader(
+    dataset_train, 
+    batch_size=batch_size, 
+    shuffle=True,
+)
+val_loader = torch.utils.data.DataLoader(
+    dataset_val, 
+    batch_size=batch_size, 
+    shuffle=False,
+)
+test_loader = torch.utils.data.DataLoader(
+    dataset_test, 
+    batch_size=batch_size, 
+    shuffle=False,
+)
 
 # 初始化模型
 encoder = Encoder(**cfg.model.encoder).to(device)
@@ -58,51 +76,87 @@ if load_model:
 
 optimizer = torch.optim.AdamW(auto_encoder.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
+# 记录训练和验证损失
 total_loss_history = []
 recon_loss_history = []
 kl_loss_history = []
+val_total_loss_history = []
+val_recon_loss_history = []
+val_kl_loss_history = []
 
 start_time = time.time()
 
 for epoch in range(epochs):
     print(f"Epoch {epoch + 1}/{epochs}")
-    avg_epoch_loss, avg_epoch_recon_loss, avg_epoch_kl_loss = train_VAE(ds_loader, optimizer, auto_encoder, loss, device)
+    
+    # 训练阶段
+    avg_epoch_loss, avg_epoch_recon_loss, avg_epoch_kl_loss = train_VAE(train_loader, optimizer, auto_encoder, loss, device)
     total_loss_history.append(avg_epoch_loss)
     recon_loss_history.append(avg_epoch_recon_loss)
     kl_loss_history.append(avg_epoch_kl_loss)
+    
+    # 验证阶段
+    avg_val_loss, avg_val_recon_loss, avg_val_kl_loss = evaluate_VAE(val_loader, auto_encoder, loss, device)
+    val_total_loss_history.append(avg_val_loss)
+    val_recon_loss_history.append(avg_val_recon_loss)
+    val_kl_loss_history.append(avg_val_kl_loss)
+    
+    # 保存模型
     torch.save(auto_encoder.state_dict(), vae_model_path)
-    print(f"Epoch {epoch + 1} Completed. Average Loss: {avg_epoch_loss:.4f}, Average Recon Loss: {avg_epoch_recon_loss:.4f}, Average KL Loss: {avg_epoch_kl_loss:.4f}")
+    
+    # 记录训练进度
+    with open('./checkpoint/vae_progress.txt', 'w') as f:
+        f.write(f"训练进度: {epoch+1}/{epochs} epochs ({(epoch+1)/epochs*100:.2f}%)\n")
+        f.write(f"已用时间: {(time.time() - start_time) / 60:.2f} 分钟\n")
+        f.write(f"当前训练总损失: {avg_epoch_loss:.4f}\n")
+        f.write(f"当前训练重构损失: {avg_epoch_recon_loss:.4f}\n")
+        f.write(f"当前训练KL损失: {avg_epoch_kl_loss:.4f}\n")
+        f.write(f"当前验证总损失: {avg_val_loss:.4f}\n")
+        f.write(f"当前验证重构损失: {avg_val_recon_loss:.4f}\n")
+        f.write(f"当前验证KL损失: {avg_val_kl_loss:.4f}\n")
+    
+    print(f"Epoch {epoch + 1} Completed.")
+    print(f"训练 - 总损失: {avg_epoch_loss:.4f}, 重构损失: {avg_epoch_recon_loss:.4f}, KL损失: {avg_epoch_kl_loss:.4f}")
+    print(f"验证 - 总损失: {avg_val_loss:.4f}, 重构损失: {avg_val_recon_loss:.4f}, KL损失: {avg_val_kl_loss:.4f}")
     print("-" * 50)
 
-print("Training completed!")
-print(f"Total training time: {(time.time() - start_time) / 60:.2f} minutes.")
+# 测试阶段
+avg_test_loss, avg_test_recon_loss, avg_test_kl_loss = test_VAE(test_loader, auto_encoder, loss, device)
+print("训练完成!")
+print(f"总训练时间: {(time.time() - start_time) / 60:.2f} 分钟.")
+print(f"最终测试总损失: {avg_test_loss:.4f}, 重构损失: {avg_test_recon_loss:.4f}, KL损失: {avg_test_kl_loss:.4f}")
 
+# 绘制训练和验证的总损失
 plt.figure(figsize=(10, 6))
-plt.plot(range(1, len(total_loss_history) + 1), total_loss_history, marker='o', label="Training Total Loss")
-plt.title("Training Total Loss Over Epochs")
-plt.xlabel("epochs")
-plt.ylabel("Loss")
+plt.plot(range(1, len(total_loss_history) + 1), total_loss_history, marker='o', label="训练总损失")
+plt.plot(range(1, len(val_total_loss_history) + 1), val_total_loss_history, marker='s', label="验证总损失")
+plt.title("训练和验证总损失随时间变化")
+plt.xlabel("Epoch")
+plt.ylabel("损失")
 plt.grid()
 plt.legend()
-plt.show()
 plt.savefig(f"./losses/MS_COCO_VAE_Total_Loss_{time.time()}.png")
 plt.close()
 
+# 绘制训练和验证的重构损失
 plt.figure(figsize=(10, 6))
-plt.plot(range(1, len(recon_loss_history) + 1), recon_loss_history, marker='o', color='orange', label="Training Recon Loss")
-plt.title("Training Recon Loss Over Epochs")
-plt.xlabel("epochs")
-plt.ylabel("Loss")
+plt.plot(range(1, len(recon_loss_history) + 1), recon_loss_history, marker='o', color='orange', label="训练重构损失")
+plt.plot(range(1, len(val_recon_loss_history) + 1), val_recon_loss_history, marker='s', color='red', label="验证重构损失")
+plt.title("训练和验证重构损失随时间变化")
+plt.xlabel("Epoch")
+plt.ylabel("损失")
 plt.grid()
 plt.legend()
 plt.savefig(f"./losses/MS_COCO_VAE_Recon_Loss_{time.time()}.png")
 plt.close()
 
+# 绘制训练和验证的KL损失
 plt.figure(figsize=(10, 6))
-plt.plot(range(1, len(kl_loss_history) + 1), kl_loss_history, marker='o', color='green', label="KL Loss")
-plt.title("Training Recon Loss Over Epochs")
-plt.xlabel("epochs")
-plt.ylabel("Loss")
+plt.plot(range(1, len(kl_loss_history) + 1), kl_loss_history, marker='o', color='green', label="训练KL损失")
+plt.plot(range(1, len(val_kl_loss_history) + 1), val_kl_loss_history, marker='s', color='purple', label="验证KL损失")
+plt.title("训练和验证KL损失随时间变化")
+plt.xlabel("Epoch")
+plt.ylabel("损失")
 plt.grid()
 plt.legend()
 plt.savefig(f"./losses/MS_COCO_VAE_KL_Loss_{time.time()}.png")

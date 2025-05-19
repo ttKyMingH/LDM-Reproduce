@@ -2,6 +2,7 @@ from torch import Tensor
 from transformers import AutoTokenizer, AutoModel
 import torch
 from omegaconf import OmegaConf
+
 # 加载配置文件
 cfg = OmegaConf.load('./config/ldm_cond.yaml')
 
@@ -18,7 +19,14 @@ class ContextEmbedder:
 
         return model_output.pooler_output.squeeze(0)
 
-if __name__ == '__main__':
-    embedder = ContextEmbedder(**cfg.model.ldm.context_embedder)
-    cond_embedding = embedder.embed('hello')
-    print(cond_embedding.shape)
+    def get_token(self, text: str) -> Tensor:
+        text = 'query:' + text
+        input_texts = self.tokenizer(text, max_length=512, padding=True, truncation=True, return_tensors='pt')
+        return input_texts
+
+    def get_token2embedding(self, input_texts: Tensor) -> Tensor:
+        with torch.no_grad():
+            model_output = self.model(**input_texts)
+
+        return model_output.pooler_output.squeeze(0)
+        
