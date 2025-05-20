@@ -42,14 +42,14 @@ model:
     linear_start: 0.0015
     linear_end: 0.0155
 
-    context_embedder:
+    context_embedder_path:
       model_name: 'intfloat/multilingual-e5-small'
       cache_dir: './model/models--intfloat--multilingual-e5-small'
 
 training:
   use_cuda: true
   image_size: 256
-  batch_size: 96
+  batch_size: 12
   epochs: 3
   learning_rate: 5.0e-5 
   weight_decay: 5.0e-5 

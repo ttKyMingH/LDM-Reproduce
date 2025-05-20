@@ -14,7 +14,8 @@ from LatentDiffusion import LatentDiffusion
 from sampler.DDPMSampler import DDPMSampler
 from model.AutoEncoder import AutoEncoder, Encoder, Decoder
 from model.Context_embedder import ContextEmbedder
-from utils import train_LDM
+from utils import train_LDM, evaluate_LDM, test_LDM, MSCOCOImageDataset
+from datasets import load_dataset
 
 # 加载配置文件
 cfg = OmegaConf.load('./config/ldm_cond.yaml')
@@ -79,25 +80,28 @@ auto_encoder = AutoEncoder(
 )
 
 cond_encoder = ContextEmbedder(
-    **cfg.model.ldm.context_embedder
+    **cfg.model.ldm.context_embedder_path
 )
 
 auto_encoder.load_state_dict(torch.load(vae_model_path))
+
+# 从cfg.model.ldm中移除context_embedder_path
+ldm_config = {k: v for k, v in cfg.model.ldm.items() if k != 'context_embedder_path'}
 
 ldm = LatentDiffusion(
     unet_model=unet,
     auto_encoder=auto_encoder,
     context_embedder=cond_encoder,
-    **cfg.model.ldm
+    **ldm_config
 ).to(device)
+
+if load_model:
+    unet.load_state_dict(torch.load(model_path))
 
 # 如果使用多GPU，则使用DataParallel包装模型
 if torch.cuda.is_available() and cfg.training.use_cuda and len(device_ids) > 1:
     ldm = nn.DataParallel(ldm, device_ids=device_ids)
     print(f"模型已使用DataParallel在{len(device_ids)}个GPU上并行")
-
-if load_model:
-    unet.load_state_dict(torch.load(model_path))
 
 ddpm = DDPMSampler(ldm)
 
@@ -117,13 +121,16 @@ for epoch in range(epochs):
     val_loss_history.append(avg_val_loss)
 
     torch.save(unet.state_dict(), model_path)
-    print(f"Epoch {epoch + 1} Completed. Average Loss: {avg_epoch_loss:.4f}")
+    print(f"Epoch {epoch + 1} Completed. Average Loss: {avg_epoch_loss:.6f}")
     print("-" * 50)
 
 avg_test_loss = test_LDM(test_loader, ldm, ddpm, d_cond, device)
 print("Training completed!")
 print(f"Total training time: {(time.time() - start_time) / 60:.2f} minutes.")
-print(f"Final test loss: {avg_test_loss:.4f}")
+print(f"Final test loss: {avg_test_loss:.6f}")
+
+# 确保losses目录存在
+os.makedirs("./losses", exist_ok=True)
 
 plt.figure(figsize=(10, 6))
 plt.plot(range(1, len(loss_history) + 1), loss_history, marker='o', label="Training Loss")

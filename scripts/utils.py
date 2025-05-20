@@ -134,7 +134,7 @@ def train_LDM(train_loader, optimizer, ldm, sampler, d_cond, device):
         epoch_loss.append(loss.item())
 
         if (step + 1) % 50 == 0:
-            print(f"Step {step + 1}/{len(train_loader)} - Loss: {loss.item():.4f}")
+            print(f"Step {step + 1}/{len(train_loader)} - Loss: {loss.item():.6f}")
 
     avg_epoch_loss = torch.tensor(epoch_loss).mean().item()
     return avg_epoch_loss
@@ -163,7 +163,7 @@ def evaluate_LDM(val_loader, ldm, sampler, d_cond, device):
             loss = sampler.loss(z, cond)
             val_losses.append(loss.item())
         avg_val_loss = torch.tensor(val_losses).mean().item()
-        print(f"Validation Loss: {avg_val_loss:.4f}")
+        print(f"Validation Loss: {avg_val_loss:.6f}")
     return avg_val_loss
 
 def test_LDM(test_loader, ldm, sampler, d_cond, device):
@@ -190,7 +190,7 @@ def test_LDM(test_loader, ldm, sampler, d_cond, device):
             loss = sampler.loss(z, cond)
             test_losses.append(loss.item())
         avg_test_loss = torch.tensor(test_losses).mean().item()
-        print(f"Test Loss: {avg_test_loss:.4f}")
+        print(f"Test Loss: {avg_test_loss:.6f}")
     return avg_test_loss
 
 from datasets import concatenate_datasets

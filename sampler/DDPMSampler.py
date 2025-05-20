@@ -21,8 +21,13 @@ class DDPMSampler(DiffusionSampler):
 
         self.time_steps = np.asarray(list(range(self.n_steps)))
         with torch.no_grad():
-            alpha_bar = self.model.alpha_bar
-            beta = self.model.beta
+            # 检查模型是否为DataParallel类型
+            if isinstance(self.model, torch.nn.DataParallel):
+                alpha_bar = self.model.module.alpha_bar
+                beta = self.model.module.beta
+            else:
+                alpha_bar = self.model.alpha_bar
+                beta = self.model.beta
 
             alpha_bar_prev = torch.cat([alpha_bar.new_tensor([1.]), alpha_bar[:-1]])
 
@@ -47,7 +52,12 @@ class DDPMSampler(DiffusionSampler):
                uncond_scale=1,
                uncond_cond=None,
                skip_steps=0):
-        device = self.model.device()
+        # 检查模型是否为DataParallel类型
+        if isinstance(self.model, torch.nn.DataParallel):
+            device = self.model.module.device()
+        else:
+            device = self.model.device()
+            
         bs = shape[0]
 
         x = x_last if x_last is not None else torch.randn(shape, device=device)
@@ -95,7 +105,12 @@ class DDPMSampler(DiffusionSampler):
 
         noise = noise * temperature
 
-        device = self.model.device()
+        # 检查模型是否为DataParallel类型
+        if isinstance(self.model, torch.nn.DataParallel):
+            device = self.model.module.device()
+        else:
+            device = self.model.device()
+            
         noise = noise.to(device)
 
         x_prev = mean + (log_var * 0.5).exp() * noise

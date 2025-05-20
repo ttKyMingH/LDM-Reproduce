@@ -144,6 +144,9 @@ print("训练完成!")
 print(f"总训练时间: {(time.time() - start_time) / 60:.2f} 分钟.")
 print(f"最终测试总损失: {avg_test_loss:.6f}, 重构损失: {avg_test_recon_loss:.6f}, KL损失: {avg_test_kl_loss:.6f}")
 
+# 确保losses目录存在
+os.makedirs("./losses", exist_ok=True)
+
 # 绘制训练和验证的总损失
 plt.figure(figsize=(10, 6))
 plt.plot(range(1, len(total_loss_history) + 1), total_loss_history, marker='o', label="训练总损失")

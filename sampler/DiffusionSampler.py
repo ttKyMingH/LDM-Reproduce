@@ -3,8 +3,13 @@ import torch
 class DiffusionSampler:
     def __init__(self, model):
         super().__init__()
-        self.model = model
-        self.n_steps = model.n_steps
+         # 检查模型是否为DataParallel类型
+        if isinstance(model, torch.nn.DataParallel):
+            self.model = model
+            self.n_steps = model.module.n_steps
+        else:
+            self.model = model
+            self.n_steps = model.n_steps
 
     def get_eps(self, x, t, c, uncond_scale, uncond_cond):
         if uncond_cond is None and uncond_scale == 1:
