@@ -80,13 +80,14 @@ auto_encoder = AutoEncoder(
     **cfg.model.auto_encoder
 ).to(device)
 
+# 先加载模型，再使用DataParallel包装
+if load_model:
+    auto_encoder.load_state_dict(torch.load(vae_model_path))
+
 # 如果使用多GPU，则使用DataParallel包装模型
 if torch.cuda.is_available() and cfg.training.use_cuda and len(device_ids) > 1:
     auto_encoder = nn.DataParallel(auto_encoder, device_ids=device_ids)
     print(f"模型已使用DataParallel在{len(device_ids)}个GPU上并行")
-
-if load_model:
-    auto_encoder.load_state_dict(torch.load(vae_model_path))
 
 optimizer = torch.optim.AdamW(auto_encoder.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
@@ -125,23 +126,23 @@ for epoch in range(epochs):
     with open('./checkpoint/vae_progress.txt', 'w') as f:
         f.write(f"训练进度: {epoch+1}/{epochs} epochs ({(epoch+1)/epochs*100:.2f}%)\n")
         f.write(f"已用时间: {(time.time() - start_time) / 60:.2f} 分钟\n")
-        f.write(f"当前训练总损失: {avg_epoch_loss:.4f}\n")
-        f.write(f"当前训练重构损失: {avg_epoch_recon_loss:.4f}\n")
-        f.write(f"当前训练KL损失: {avg_epoch_kl_loss:.4f}\n")
-        f.write(f"当前验证总损失: {avg_val_loss:.4f}\n")
-        f.write(f"当前验证重构损失: {avg_val_recon_loss:.4f}\n")
-        f.write(f"当前验证KL损失: {avg_val_kl_loss:.4f}\n")
+        f.write(f"当前训练总损失: {avg_epoch_loss:.6f}\n")
+        f.write(f"当前训练重构损失: {avg_epoch_recon_loss:.6f}\n")
+        f.write(f"当前训练KL损失: {avg_epoch_kl_loss:.6f}\n")
+        f.write(f"当前验证总损失: {avg_val_loss:.6f}\n")
+        f.write(f"当前验证重构损失: {avg_val_recon_loss:.6f}\n")
+        f.write(f"当前验证KL损失: {avg_val_kl_loss:.6f}\n")
     
     print(f"Epoch {epoch + 1} Completed.")
-    print(f"训练 - 总损失: {avg_epoch_loss:.4f}, 重构损失: {avg_epoch_recon_loss:.4f}, KL损失: {avg_epoch_kl_loss:.4f}")
-    print(f"验证 - 总损失: {avg_val_loss:.4f}, 重构损失: {avg_val_recon_loss:.4f}, KL损失: {avg_val_kl_loss:.4f}")
+    print(f"训练 - 总损失: {avg_epoch_loss:.6f}, 重构损失: {avg_epoch_recon_loss:.6f}, KL损失: {avg_epoch_kl_loss:.6f}")
+    print(f"验证 - 总损失: {avg_val_loss:.6f}, 重构损失: {avg_val_recon_loss:.6f}, KL损失: {avg_val_kl_loss:.6f}")
     print("-" * 50)
 
 # 测试阶段
 avg_test_loss, avg_test_recon_loss, avg_test_kl_loss = test_VAE(test_loader, auto_encoder, loss, device)
 print("训练完成!")
 print(f"总训练时间: {(time.time() - start_time) / 60:.2f} 分钟.")
-print(f"最终测试总损失: {avg_test_loss:.4f}, 重构损失: {avg_test_recon_loss:.4f}, KL损失: {avg_test_kl_loss:.4f}")
+print(f"最终测试总损失: {avg_test_loss:.6f}, 重构损失: {avg_test_recon_loss:.6f}, KL损失: {avg_test_kl_loss:.6f}")
 
 # 绘制训练和验证的总损失
 plt.figure(figsize=(10, 6))

@@ -32,7 +32,7 @@ def train_VAE(train_loader, optimizer, auto_encoder, loss, device):
         epoch_kl_loss.append(kl_loss.item())
 
         if (step + 1) % 50 == 0:
-            print(f"Step {step + 1}/{len(train_loader)} - Recon Loss: {recon_loss.item():.4f} - KL Loss: {kl_loss.item():.4f}")
+            print(f"Step {step + 1}/{len(train_loader)} - Recon Loss: {recon_loss.item():.6f} - KL Loss: {kl_loss.item():.6f}")
 
     avg_epoch_loss = torch.tensor(epoch_total_loss).mean().item()
     avg_epoch_recon_loss = torch.tensor(epoch_recon_loss).mean().item()
@@ -69,7 +69,7 @@ def evaluate_VAE(val_loader, auto_encoder, loss, device):
         avg_epoch_recon_loss = torch.tensor(epoch_recon_loss).mean().item()
         avg_epoch_kl_loss = torch.tensor(epoch_kl_loss).mean().item()
         
-        print(f"验证集 - 总损失: {avg_epoch_loss:.4f} - 重构损失: {avg_epoch_recon_loss:.4f} - KL损失: {avg_epoch_kl_loss:.4f}")
+        print(f"验证集 - 总损失: {avg_epoch_loss:.6f} - 重构损失: {avg_epoch_recon_loss:.6f} - KL损失: {avg_epoch_kl_loss:.6f}")
         
     return avg_epoch_loss, avg_epoch_recon_loss, avg_epoch_kl_loss
 
@@ -102,7 +102,7 @@ def test_VAE(test_loader, auto_encoder, loss, device):
         avg_epoch_recon_loss = torch.tensor(epoch_recon_loss).mean().item()
         avg_epoch_kl_loss = torch.tensor(epoch_kl_loss).mean().item()
         
-        print(f"测试集 - 总损失: {avg_epoch_loss:.4f} - 重构损失: {avg_epoch_recon_loss:.4f} - KL损失: {avg_epoch_kl_loss:.4f}")
+        print(f"测试集 - 总损失: {avg_epoch_loss:.6f} - 重构损失: {avg_epoch_recon_loss:.6f} - KL损失: {avg_epoch_kl_loss:.6f}")
         
     return avg_epoch_loss, avg_epoch_recon_loss, avg_epoch_kl_loss
 
