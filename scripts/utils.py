@@ -8,6 +8,7 @@ def train_VAE(train_loader, optimizer, auto_encoder, loss, device):
     epoch_total_loss = []
     epoch_recon_loss = []
     epoch_kl_loss = []
+    epoch_nll_loss = []
     for step, batch in enumerate(train_loader):  
         pics, _ = batch
         pics = pics.to(device)
@@ -21,24 +22,25 @@ def train_VAE(train_loader, optimizer, auto_encoder, loss, device):
             z = auto_encoder.encode(pics)
             pics_hat = auto_encoder.decode(z.sample())
 
-        recon_loss, kl_loss = loss(pics, pics_hat, z.mean, z.log_var, 0.5)
-        ls = recon_loss + kl_loss
+        ls, log = loss(pics, pics_hat, z, split="train")
 
         ls.backward()
         optimizer.step()
 
         epoch_total_loss.append(ls.item())
-        epoch_recon_loss.append(recon_loss.item())
-        epoch_kl_loss.append(kl_loss.item())
+        epoch_recon_loss.append(log['train/rec_loss'].item())
+        epoch_kl_loss.append(log['train/kl_loss'].item())
+        epoch_nll_loss.append(log['train/nll_loss'].item())
 
         if (step + 1) % 50 == 0:
-            print(f"Step {step + 1}/{len(train_loader)} - Recon Loss: {recon_loss.item():.6f} - KL Loss: {kl_loss.item():.6f}")
+            print(f"Step {step + 1}/{len(train_loader)} - Recon Loss: {log['train/rec_loss'].item():.6f} - KL Loss: {log['train/kl_loss'].item():.6f} - NLL Loss: {log['train/nll_loss'].item():.6f} - Total Loss: {ls.item():.6f}")
 
     avg_epoch_loss = torch.tensor(epoch_total_loss).mean().item()
     avg_epoch_recon_loss = torch.tensor(epoch_recon_loss).mean().item()
     avg_epoch_kl_loss = torch.tensor(epoch_kl_loss).mean().item()
+    avg_epoch_nll_loss = torch.tensor(epoch_nll_loss).mean().item()
 
-    return avg_epoch_loss, avg_epoch_recon_loss, avg_epoch_kl_loss
+    return avg_epoch_loss, avg_epoch_recon_loss, avg_epoch_kl_loss, avg_epoch_nll_loss
 
 def evaluate_VAE(val_loader, auto_encoder, loss, device):
     auto_encoder.eval()
@@ -46,6 +48,7 @@ def evaluate_VAE(val_loader, auto_encoder, loss, device):
         epoch_total_loss = []
         epoch_recon_loss = []
         epoch_kl_loss = []
+        epoch_nll_loss = []
         for step, batch in enumerate(val_loader):
             pics, _ = batch
             pics = pics.to(device)
@@ -58,20 +61,21 @@ def evaluate_VAE(val_loader, auto_encoder, loss, device):
                 z = auto_encoder.encode(pics)
                 pics_hat = auto_encoder.decode(z.sample())
             
-            recon_loss, kl_loss = loss(pics, pics_hat, z.mean, z.log_var, 0.5)
-            ls = recon_loss + kl_loss
+            ls, log = loss(pics, pics_hat, z, split="val")
             
             epoch_total_loss.append(ls.item())
-            epoch_recon_loss.append(recon_loss.item())
-            epoch_kl_loss.append(kl_loss.item())
+            epoch_recon_loss.append(log['val/rec_loss'].item())
+            epoch_kl_loss.append(log['val/kl_loss'].item())
+            epoch_nll_loss.append(log['val/nll_loss'].item())
             
         avg_epoch_loss = torch.tensor(epoch_total_loss).mean().item()
         avg_epoch_recon_loss = torch.tensor(epoch_recon_loss).mean().item()
         avg_epoch_kl_loss = torch.tensor(epoch_kl_loss).mean().item()
+        avg_epoch_nll_loss = torch.tensor(epoch_nll_loss).mean().item()
         
-        print(f"验证集 - 总损失: {avg_epoch_loss:.6f} - 重构损失: {avg_epoch_recon_loss:.6f} - KL损失: {avg_epoch_kl_loss:.6f}")
+        print(f"验证集 - 总损失: {avg_epoch_loss:.6f} - 重构损失: {avg_epoch_recon_loss:.6f} - KL损失: {avg_epoch_kl_loss:.6f} - NLL损失: {avg_epoch_nll_loss:.6f}")
         
-    return avg_epoch_loss, avg_epoch_recon_loss, avg_epoch_kl_loss
+    return avg_epoch_loss, avg_epoch_recon_loss, avg_epoch_kl_loss, avg_epoch_nll_loss
 
 def test_VAE(test_loader, auto_encoder, loss, device):
     auto_encoder.eval()
@@ -79,6 +83,7 @@ def test_VAE(test_loader, auto_encoder, loss, device):
         epoch_total_loss = []
         epoch_recon_loss = []
         epoch_kl_loss = []
+        epoch_nll_loss = []
         for step, batch in enumerate(test_loader):
             pics, _ = batch
             pics = pics.to(device)
@@ -91,20 +96,21 @@ def test_VAE(test_loader, auto_encoder, loss, device):
                 z = auto_encoder.encode(pics)
                 pics_hat = auto_encoder.decode(z.sample())
             
-            recon_loss, kl_loss = loss(pics, pics_hat, z.mean, z.log_var, 0.5)
-            ls = recon_loss + kl_loss
+            ls, log = loss(pics, pics_hat, z, split="test")
             
             epoch_total_loss.append(ls.item())
-            epoch_recon_loss.append(recon_loss.item())
-            epoch_kl_loss.append(kl_loss.item())
+            epoch_recon_loss.append(log['test/rec_loss'].item())
+            epoch_kl_loss.append(log['test/kl_loss'].item())
+            epoch_nll_loss.append(log['test/nll_loss'].item())
             
         avg_epoch_loss = torch.tensor(epoch_total_loss).mean().item()
         avg_epoch_recon_loss = torch.tensor(epoch_recon_loss).mean().item()
         avg_epoch_kl_loss = torch.tensor(epoch_kl_loss).mean().item()
+        avg_epoch_nll_loss = torch.tensor(epoch_nll_loss).mean().item()
         
-        print(f"测试集 - 总损失: {avg_epoch_loss:.6f} - 重构损失: {avg_epoch_recon_loss:.6f} - KL损失: {avg_epoch_kl_loss:.6f}")
+        print(f"测试集 - 总损失: {avg_epoch_loss:.6f} - 重构损失: {avg_epoch_recon_loss:.6f} - KL损失: {avg_epoch_kl_loss:.6f} - NLL损失: {avg_epoch_nll_loss:.6f}")
         
-    return avg_epoch_loss, avg_epoch_recon_loss, avg_epoch_kl_loss
+    return avg_epoch_loss, avg_epoch_recon_loss, avg_epoch_kl_loss, avg_epoch_nll_loss
 
 def train_LDM(train_loader, optimizer, ldm, sampler, d_cond, device):
     epoch_loss = []
@@ -306,3 +312,16 @@ def collate_fn(batch):
     en = pad_sequence(en, batch_first=True, padding_value=0)
 
     return images, en
+
+import wandb
+from argparse import Namespace
+
+def init_wandb(config, name):
+    wandb.login(key="632cb2519658eb44f9bf49759ea46ffcf4f20a0c")
+    wandb.init(
+        project=config.project_name,
+        name=name,
+        config=config.__dict__,
+    )
+    
+    return wandb

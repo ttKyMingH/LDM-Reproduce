@@ -5,11 +5,12 @@ import torch
 import torch.nn as nn
 
 class AutoEncoder(nn.Module):
-    def __init__(self, encoder: 'Encoder', decoder: 'Decoder', emb_channels: int, z_channels: int):
+    def __init__(self, encoder: 'Encoder', decoder: 'Decoder', emb_channels: int, z_channels: int, use_BN: bool = False):
         super().__init__()
 
         self.encoder = encoder
         self.decoder = decoder
+        self.use_BN = use_BN
 
         self.quant_conv = nn.Conv2d(2 * z_channels, 2 * emb_channels, 1)
         self.post_quant_conv = nn.Conv2d(emb_channels, z_channels, 1)
@@ -17,7 +18,7 @@ class AutoEncoder(nn.Module):
     def encode(self, img: torch.Tensor) -> 'GaussianDistribution':
         z = self.encoder(img)
         moments = self.quant_conv(z)
-        return GaussianDistribution(moments)
+        return GaussianDistribution(moments, use_BN=self.use_BN)
 
     def decode(self, z: torch.Tensor):
         z = self.post_quant_conv(z)
@@ -362,25 +363,81 @@ class Decoder(nn.Module):
         h = self.conv_out(h)
         return h
 
+class Scaler(nn.Module):
+    def __init__(self, tau=0.5, device='cuda:0',**kwargs):
+        super().__init__(**kwargs)
+        self.tau = tau
+        self.scale = None
+        self.device = device
+        
+    def build(self, input_shape):
+        self.scale = nn.Parameter(torch.zeros(input_shape[-1])).to(self.device)
+        
+    def forward(self, inputs, mode='positive'):
+        if self.scale is None:
+            self.build(inputs.shape)
+        if mode == 'positive':
+            scale = self.tau + (1 - self.tau) * torch.sigmoid(self.scale)
+        else:
+            scale = (1 - self.tau) * torch.sigmoid(-self.scale)
+        return inputs * torch.sqrt(scale)
+
 class GaussianDistribution:
-    def __init__(self, parameters: torch.Tensor):
+    def __init__(self, parameters, use_BN):
         """
         :param parameters: are the means and log of variances of the embedding of shape
             `[batch_size, z_channels * 2, z_height, z_height]`
+        :param use_BN: 是否使用BN-VAE方法
         """
         # Split mean and log of variance
         self.mean, log_var = torch.chunk(parameters, 2, dim=1)
-        # Clamp the log of variances
-        self.log_var = torch.clamp(log_var, -30.0, 20.0)
+        self.scale = Scaler(device=parameters.device)
+        
+        if use_BN:
+            # 应用BN-VAE方法
+            # 对均值进行批量归一化
+            batch_size, channels, height, width = self.mean.shape
+            mean_flat = self.mean.permute(0, 2, 3, 1).reshape(-1, channels)
+            mean_norm = torch.nn.functional.batch_norm(
+                mean_flat, 
+                None, None,  # 运行时统计
+                None, None,  # 无缩放和偏移
+                training=True, 
+                momentum=0.1, 
+                eps=1e-8
+            )
+            
+            # 应用positive scaler
+            mean_scaled = self.scale(mean_norm, mode='positive')
+            self.mean = mean_scaled.reshape(batch_size, height, width, channels).permute(0, 3, 1, 2)
+            
+            # 对方差进行批量归一化
+            log_var_flat = log_var.permute(0, 2, 3, 1).reshape(-1, channels)
+            log_var_norm = torch.nn.functional.batch_norm(
+                log_var_flat, 
+                None, None,  # 运行时统计
+                None, None,  # 无缩放和偏移
+                training=True, 
+                momentum=0.1, 
+                eps=1e-8
+            )
+            
+            # 应用negative scaler
+            log_var_scaled = self.scale(log_var_norm, mode='negative')
+            log_var = log_var_scaled.reshape(batch_size, height, width, channels).permute(0, 3, 1, 2)
+        else:
+            # 原始VAE处理方式
+            # Clamp the log of variances
+            log_var = torch.clamp(log_var, -30.0, 20.0)
+        
+        self.log_var = log_var
         # Calculate standard deviation
         self.std = torch.exp(0.5 * self.log_var)
 
     def sample(self):
         # Sample from the distribution
         return self.mean + self.std * torch.randn_like(self.std)
-
-def loss(y, y_hat, mean, log_var, kl_scale):
-    reconstruction_loss = torch.nn.functional.mse_loss(y, y_hat)
-    kl_loss = torch.mean(-0.5 * torch.sum(1 + log_var - mean ** 2 - torch.exp(log_var)))
-
-    return reconstruction_loss, kl_loss * kl_scale
+    
+    def kl(self):
+        """计算KL散度"""
+        return -0.5 * torch.sum(1 + self.log_var - self.mean.pow(2) - self.log_var.exp(), dim=[1, 2, 3])

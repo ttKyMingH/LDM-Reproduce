@@ -1,0 +1,21 @@
+Using the latest cached version of the dataset since romrawinjp/mscoco couldn't be found on the Hugging Face Hub
+Found the latest cached dataset configuration 'default' at D:\datasets\romrawinjp___mscoco\default\0.0.0\0572fd918416b93ec278f1f7f4a2212d72c40dba (last modified on Sat May 17 12:16:47 2025).
+Loading dataset shards: 100%|████████████████████████████████████████████████████| 27/27 [00:08<00:00,  3.34it/s]
+D:\Work_category\anaconda3_dirs\envs\pytorch-2.6.0-gpu\Lib\site-packages\torchvision\models\_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+D:\Work_category\anaconda3_dirs\envs\pytorch-2.6.0-gpu\Lib\site-packages\torchvision\models\_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+loaded pretrained LPIPS loss from taming/modules/autoencoder/lpips\vgg.pth
+Epoch 1/1
+Step 50/5000 - Recon Loss: 0.723286 - KL Loss: 2043.623413 - NLL Loss: 0.723286 - Total Loss: 0.725330
+Step 100/5000 - Recon Loss: 0.640193 - KL Loss: 1980.957764 - NLL Loss: 0.640193 - Total Loss: 0.642174
+Step 150/5000 - Recon Loss: 0.704334 - KL Loss: 1824.907959 - NLL Loss: 0.704334 - Total Loss: 0.706159
+Step 200/5000 - Recon Loss: 0.749575 - KL Loss: 1840.603271 - NLL Loss: 0.749575 - Total Loss: 0.751415
+Step 250/5000 - Recon Loss: 0.599652 - KL Loss: 2041.441162 - NLL Loss: 0.599652 - Total Loss: 0.601693
+Step 300/5000 - Recon Loss: 0.612697 - KL Loss: 1798.734253 - NLL Loss: 0.612697 - Total Loss: 0.614496
+Step 350/5000 - Recon Loss: 0.688277 - KL Loss: 1946.077637 - NLL Loss: 0.688277 - Total Loss: 0.690223
+Step 400/5000 - Recon Loss: 0.658910 - KL Loss: 1843.083618 - NLL Loss: 0.658910 - Total Loss: 0.660753
+Step 450/5000 - Recon Loss: 0.643932 - KL Loss: 1831.822754 - NLL Loss: 0.643932 - Total Loss: 0.645764
+Step 500/5000 - Recon Loss: 0.593277 - KL Loss: 1835.035034 - NLL Loss: 0.593277 - Total Loss: 0.595112
+Step 550/5000 - Recon Loss: 0.665504 - KL Loss: 1786.035889 - NLL Loss: 0.665504 - Total Loss: 0.667290
+Step 600/5000 - Recon Loss: 0.647124 - KL Loss: 1842.535645 - NLL Loss: 0.647124 - Total Loss: 0.648967

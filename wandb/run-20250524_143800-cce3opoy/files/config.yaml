@@ -1,0 +1,50 @@
+_wandb:
+    value:
+        cli_version: 0.19.7
+        m: []
+        python_version: 3.12.7
+        t:
+            "1":
+                - 1
+                - 41
+                - 49
+                - 51
+                - 55
+            "2":
+                - 1
+                - 41
+                - 49
+                - 51
+                - 55
+            "3":
+                - 13
+                - 16
+                - 23
+                - 55
+            "4": 3.12.7
+            "5": 0.19.7
+            "8":
+                - 3
+                - 5
+            "12": 0.19.7
+            "13": windows-amd64
+batch_size:
+    value: 1
+c:
+    value: 4
+ckpt_path:
+    value: ./checkpoint/MS_COCO_VAE3.pkl
+epochs:
+    value: 1
+f:
+    value: 8
+kl_weight:
+    value: 1e-06
+lr:
+    value: 4.5e-06
+optim_type:
+    value: AdamW
+project_name:
+    value: VAE
+weight_decay:
+    value: 4.5e-06

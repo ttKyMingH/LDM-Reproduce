@@ -24,13 +24,19 @@ model:
   auto_encoder:
     emb_channels: 4
     z_channels: 4
+    use_BN: True
+  
+  loss:
+    logvar_init: 0.0
+    kl_weight: 1e-6
+    perceptual_weight: 1.0
 
 training:
-  use_cuda: true
+  use_cuda: [0, 1]
   image_size: 256
-  batch_size: 6
+  batch_size: 8
   epochs: 10
-  learning_rate: 4.5e-7
-  weight_decay: 4.5e-7
-  model_path: './checkpoint/MS_COCO_VAE.pkl'
+  learning_rate: 4.5e-6
+  weight_decay: 4.5e-6
+  model_path: './checkpoint/MS_COCO_VAE3.pkl'
   load_model: false

@@ -1,0 +1,114 @@
+Using the latest cached version of the dataset since romrawinjp/mscoco couldn't be found on the Hugging Face Hub
+Found the latest cached dataset configuration 'default' at D:\datasets\romrawinjp___mscoco\default\0.0.0\0572fd918416b93ec278f1f7f4a2212d72c40dba (last modified on Sat May 17 12:16:47 2025).
+Loading dataset shards: 100%|██████████████████████████████████████████████████████████████████████████████████████| 27/27 [00:08<00:00,  3.34it/s]
+D:\Work_category\anaconda3_dirs\envs\pytorch-2.6.0-gpu\Lib\site-packages\torchvision\models\_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+D:\Work_category\anaconda3_dirs\envs\pytorch-2.6.0-gpu\Lib\site-packages\torchvision\models\_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=VGG16_Weights.IMAGENET1K_V1`. You can also use `weights=VGG16_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+loaded pretrained LPIPS loss from taming/modules/autoencoder/lpips\vgg.pth
+Epoch 1/1
+Step 50/5000 - Recon Loss: 0.685465 - KL Loss: 1800.517700 - NLL Loss: 0.685465 - Total Loss: 0.687266
+Step 100/5000 - Recon Loss: 0.642943 - KL Loss: 1825.925171 - NLL Loss: 0.642943 - Total Loss: 0.644768
+Step 150/5000 - Recon Loss: 0.710862 - KL Loss: 1827.590698 - NLL Loss: 0.710862 - Total Loss: 0.712690
+Step 200/5000 - Recon Loss: 0.755009 - KL Loss: 1824.956177 - NLL Loss: 0.755009 - Total Loss: 0.756834
+Step 250/5000 - Recon Loss: 0.594371 - KL Loss: 1803.884277 - NLL Loss: 0.594371 - Total Loss: 0.596175
+Step 300/5000 - Recon Loss: 0.621470 - KL Loss: 1811.267700 - NLL Loss: 0.621470 - Total Loss: 0.623281
+Step 350/5000 - Recon Loss: 0.660928 - KL Loss: 1849.820801 - NLL Loss: 0.660928 - Total Loss: 0.662777
+Step 400/5000 - Recon Loss: 0.621711 - KL Loss: 1815.638916 - NLL Loss: 0.621711 - Total Loss: 0.623526
+Step 450/5000 - Recon Loss: 0.645627 - KL Loss: 1813.372559 - NLL Loss: 0.645627 - Total Loss: 0.647440
+Step 500/5000 - Recon Loss: 0.604245 - KL Loss: 1850.268677 - NLL Loss: 0.604245 - Total Loss: 0.606095
+Step 550/5000 - Recon Loss: 0.635078 - KL Loss: 1821.920898 - NLL Loss: 0.635078 - Total Loss: 0.636900
+Step 600/5000 - Recon Loss: 0.610340 - KL Loss: 1789.062500 - NLL Loss: 0.610340 - Total Loss: 0.612129
+Step 650/5000 - Recon Loss: 0.605813 - KL Loss: 1808.403076 - NLL Loss: 0.605813 - Total Loss: 0.607622
+Step 700/5000 - Recon Loss: 0.611487 - KL Loss: 1805.186279 - NLL Loss: 0.611487 - Total Loss: 0.613292
+Step 750/5000 - Recon Loss: 0.655695 - KL Loss: 1814.866943 - NLL Loss: 0.655695 - Total Loss: 0.657510
+Step 800/5000 - Recon Loss: 0.688583 - KL Loss: 1817.486206 - NLL Loss: 0.688583 - Total Loss: 0.690401
+Step 850/5000 - Recon Loss: 0.575803 - KL Loss: 1824.771851 - NLL Loss: 0.575803 - Total Loss: 0.577627
+Step 900/5000 - Recon Loss: 0.547538 - KL Loss: 1802.220947 - NLL Loss: 0.547538 - Total Loss: 0.549340
+Step 950/5000 - Recon Loss: 0.624406 - KL Loss: 1798.531494 - NLL Loss: 0.624406 - Total Loss: 0.626204
+Step 1000/5000 - Recon Loss: 0.552868 - KL Loss: 1811.381836 - NLL Loss: 0.552868 - Total Loss: 0.554680
+Step 1050/5000 - Recon Loss: 0.617231 - KL Loss: 1808.643677 - NLL Loss: 0.617231 - Total Loss: 0.619040
+Step 1100/5000 - Recon Loss: 0.579741 - KL Loss: 1803.131470 - NLL Loss: 0.579741 - Total Loss: 0.581544
+Step 1150/5000 - Recon Loss: 0.560311 - KL Loss: 1852.394653 - NLL Loss: 0.560311 - Total Loss: 0.562163
+Step 1200/5000 - Recon Loss: 0.590015 - KL Loss: 1822.289673 - NLL Loss: 0.590015 - Total Loss: 0.591837
+Step 1250/5000 - Recon Loss: 0.530246 - KL Loss: 1844.946533 - NLL Loss: 0.530246 - Total Loss: 0.532091
+Step 1300/5000 - Recon Loss: 0.602748 - KL Loss: 1808.886475 - NLL Loss: 0.602748 - Total Loss: 0.604557
+Step 1350/5000 - Recon Loss: 0.579701 - KL Loss: 1804.966553 - NLL Loss: 0.579701 - Total Loss: 0.581506
+Step 1400/5000 - Recon Loss: 0.625932 - KL Loss: 1828.702393 - NLL Loss: 0.625932 - Total Loss: 0.627760
+Step 1450/5000 - Recon Loss: 0.562408 - KL Loss: 1819.781372 - NLL Loss: 0.562408 - Total Loss: 0.564227
+Step 1500/5000 - Recon Loss: 0.566044 - KL Loss: 1855.139893 - NLL Loss: 0.566044 - Total Loss: 0.567899
+Step 1550/5000 - Recon Loss: 0.527718 - KL Loss: 1835.709106 - NLL Loss: 0.527718 - Total Loss: 0.529553
+Step 1600/5000 - Recon Loss: 0.602596 - KL Loss: 1814.758911 - NLL Loss: 0.602596 - Total Loss: 0.604411
+Step 1650/5000 - Recon Loss: 0.699877 - KL Loss: 1838.724365 - NLL Loss: 0.699877 - Total Loss: 0.701716
+Step 1700/5000 - Recon Loss: 0.508982 - KL Loss: 1831.285400 - NLL Loss: 0.508982 - Total Loss: 0.510814
+Step 1750/5000 - Recon Loss: 0.514644 - KL Loss: 1851.566162 - NLL Loss: 0.514644 - Total Loss: 0.516495
+Step 1800/5000 - Recon Loss: 0.581879 - KL Loss: 1804.606934 - NLL Loss: 0.581879 - Total Loss: 0.583684
+Step 1850/5000 - Recon Loss: 0.580611 - KL Loss: 1845.118286 - NLL Loss: 0.580611 - Total Loss: 0.582456
+Step 1900/5000 - Recon Loss: 0.525600 - KL Loss: 1826.502197 - NLL Loss: 0.525600 - Total Loss: 0.527426
+Step 1950/5000 - Recon Loss: 0.546209 - KL Loss: 1806.699463 - NLL Loss: 0.546209 - Total Loss: 0.548016
+Step 2000/5000 - Recon Loss: 0.533885 - KL Loss: 1826.013184 - NLL Loss: 0.533885 - Total Loss: 0.535711
+Step 2050/5000 - Recon Loss: 0.688937 - KL Loss: 1818.447510 - NLL Loss: 0.688937 - Total Loss: 0.690755
+Step 2100/5000 - Recon Loss: 0.522806 - KL Loss: 1823.336670 - NLL Loss: 0.522806 - Total Loss: 0.524629
+Step 2150/5000 - Recon Loss: 0.613825 - KL Loss: 1835.709106 - NLL Loss: 0.613825 - Total Loss: 0.615661
+Step 2200/5000 - Recon Loss: 0.542466 - KL Loss: 1846.566162 - NLL Loss: 0.542466 - Total Loss: 0.544313
+Step 2250/5000 - Recon Loss: 0.529113 - KL Loss: 1828.885010 - NLL Loss: 0.529113 - Total Loss: 0.530942
+Step 2300/5000 - Recon Loss: 0.556497 - KL Loss: 1824.735840 - NLL Loss: 0.556497 - Total Loss: 0.558321
+Step 2350/5000 - Recon Loss: 0.495517 - KL Loss: 1804.128540 - NLL Loss: 0.495517 - Total Loss: 0.497321
+Step 2400/5000 - Recon Loss: 0.527358 - KL Loss: 1835.804810 - NLL Loss: 0.527358 - Total Loss: 0.529194
+Step 2450/5000 - Recon Loss: 0.569895 - KL Loss: 1815.343018 - NLL Loss: 0.569895 - Total Loss: 0.571711
+Step 2500/5000 - Recon Loss: 0.582882 - KL Loss: 1813.560425 - NLL Loss: 0.582882 - Total Loss: 0.584695
+Step 2550/5000 - Recon Loss: 0.610040 - KL Loss: 1829.200806 - NLL Loss: 0.610040 - Total Loss: 0.611869
+Step 2600/5000 - Recon Loss: 0.571075 - KL Loss: 1817.977295 - NLL Loss: 0.571075 - Total Loss: 0.572893
+Step 2650/5000 - Recon Loss: 0.563967 - KL Loss: 1832.744385 - NLL Loss: 0.563967 - Total Loss: 0.565799
+Step 2700/5000 - Recon Loss: 0.532546 - KL Loss: 1834.802002 - NLL Loss: 0.532546 - Total Loss: 0.534381
+Step 2750/5000 - Recon Loss: 0.561391 - KL Loss: 1830.078857 - NLL Loss: 0.561391 - Total Loss: 0.563221
+Step 2800/5000 - Recon Loss: 0.601140 - KL Loss: 1817.790527 - NLL Loss: 0.601140 - Total Loss: 0.602958
+Step 2850/5000 - Recon Loss: 0.535387 - KL Loss: 1847.303955 - NLL Loss: 0.535387 - Total Loss: 0.537234
+Step 2900/5000 - Recon Loss: 0.504445 - KL Loss: 1813.455933 - NLL Loss: 0.504445 - Total Loss: 0.506258
+Step 2950/5000 - Recon Loss: 0.552723 - KL Loss: 1831.539917 - NLL Loss: 0.552723 - Total Loss: 0.554554
+Step 3000/5000 - Recon Loss: 0.516118 - KL Loss: 1840.865234 - NLL Loss: 0.516118 - Total Loss: 0.517959
+Step 3050/5000 - Recon Loss: 0.433557 - KL Loss: 1869.958984 - NLL Loss: 0.433557 - Total Loss: 0.435427
+Step 3100/5000 - Recon Loss: 0.539904 - KL Loss: 1810.272949 - NLL Loss: 0.539904 - Total Loss: 0.541715
+Step 3150/5000 - Recon Loss: 0.526054 - KL Loss: 1850.142822 - NLL Loss: 0.526054 - Total Loss: 0.527904
+Step 3200/5000 - Recon Loss: 0.460165 - KL Loss: 1829.791504 - NLL Loss: 0.460165 - Total Loss: 0.461995
+Step 3250/5000 - Recon Loss: 0.594985 - KL Loss: 1842.226196 - NLL Loss: 0.594985 - Total Loss: 0.596827
+Step 3300/5000 - Recon Loss: 0.556885 - KL Loss: 1821.737305 - NLL Loss: 0.556885 - Total Loss: 0.558707
+Step 3350/5000 - Recon Loss: 0.571172 - KL Loss: 1829.201172 - NLL Loss: 0.571172 - Total Loss: 0.573002
+Step 3400/5000 - Recon Loss: 0.546315 - KL Loss: 1834.904541 - NLL Loss: 0.546315 - Total Loss: 0.548150
+Step 3450/5000 - Recon Loss: 0.597566 - KL Loss: 1842.575439 - NLL Loss: 0.597566 - Total Loss: 0.599409
+Step 3500/5000 - Recon Loss: 0.585871 - KL Loss: 1850.662842 - NLL Loss: 0.585871 - Total Loss: 0.587722
+Step 3550/5000 - Recon Loss: 0.535871 - KL Loss: 1821.336304 - NLL Loss: 0.535871 - Total Loss: 0.537692
+Step 3600/5000 - Recon Loss: 0.570112 - KL Loss: 1830.387451 - NLL Loss: 0.570112 - Total Loss: 0.571943
+Step 3650/5000 - Recon Loss: 0.508435 - KL Loss: 1810.474365 - NLL Loss: 0.508435 - Total Loss: 0.510245
+Step 3700/5000 - Recon Loss: 0.529676 - KL Loss: 1827.102295 - NLL Loss: 0.529676 - Total Loss: 0.531503
+Step 3750/5000 - Recon Loss: 0.510171 - KL Loss: 1841.814697 - NLL Loss: 0.510171 - Total Loss: 0.512013
+Step 3800/5000 - Recon Loss: 0.522878 - KL Loss: 1875.143188 - NLL Loss: 0.522878 - Total Loss: 0.524753
+Step 3850/5000 - Recon Loss: 0.489843 - KL Loss: 1836.808350 - NLL Loss: 0.489843 - Total Loss: 0.491680
+Step 3900/5000 - Recon Loss: 0.527979 - KL Loss: 1861.728027 - NLL Loss: 0.527979 - Total Loss: 0.529841
+Step 3950/5000 - Recon Loss: 0.529735 - KL Loss: 1832.496826 - NLL Loss: 0.529735 - Total Loss: 0.531567
+Step 4000/5000 - Recon Loss: 0.466391 - KL Loss: 1822.766113 - NLL Loss: 0.466391 - Total Loss: 0.468214
+Step 4050/5000 - Recon Loss: 0.504902 - KL Loss: 1844.052368 - NLL Loss: 0.504902 - Total Loss: 0.506746
+Step 4100/5000 - Recon Loss: 0.494589 - KL Loss: 1819.583130 - NLL Loss: 0.494589 - Total Loss: 0.496409
+Step 4150/5000 - Recon Loss: 0.412209 - KL Loss: 1832.957031 - NLL Loss: 0.412209 - Total Loss: 0.414042
+Step 4200/5000 - Recon Loss: 0.543789 - KL Loss: 1839.291748 - NLL Loss: 0.543789 - Total Loss: 0.545629
+Step 4250/5000 - Recon Loss: 0.436550 - KL Loss: 1813.485352 - NLL Loss: 0.436550 - Total Loss: 0.438363
+Step 4300/5000 - Recon Loss: 0.518416 - KL Loss: 1832.912231 - NLL Loss: 0.518416 - Total Loss: 0.520249
+Step 4350/5000 - Recon Loss: 0.515928 - KL Loss: 1819.486450 - NLL Loss: 0.515928 - Total Loss: 0.517747
+Step 4400/5000 - Recon Loss: 0.509298 - KL Loss: 1872.700928 - NLL Loss: 0.509298 - Total Loss: 0.511171
+Step 4450/5000 - Recon Loss: 0.567007 - KL Loss: 1828.877686 - NLL Loss: 0.567007 - Total Loss: 0.568836
+Step 4500/5000 - Recon Loss: 0.541635 - KL Loss: 1835.938965 - NLL Loss: 0.541635 - Total Loss: 0.543471
+Step 4550/5000 - Recon Loss: 0.484391 - KL Loss: 1847.939209 - NLL Loss: 0.484391 - Total Loss: 0.486239
+Step 4600/5000 - Recon Loss: 0.547041 - KL Loss: 1846.332520 - NLL Loss: 0.547041 - Total Loss: 0.548887
+Step 4650/5000 - Recon Loss: 0.521124 - KL Loss: 1839.726562 - NLL Loss: 0.521124 - Total Loss: 0.522964
+Step 4700/5000 - Recon Loss: 0.549871 - KL Loss: 1832.492676 - NLL Loss: 0.549871 - Total Loss: 0.551703
+Step 4750/5000 - Recon Loss: 0.406161 - KL Loss: 1821.858276 - NLL Loss: 0.406161 - Total Loss: 0.407983
+Step 4800/5000 - Recon Loss: 0.509963 - KL Loss: 1851.044678 - NLL Loss: 0.509963 - Total Loss: 0.511814
+Step 4850/5000 - Recon Loss: 0.557127 - KL Loss: 1837.883545 - NLL Loss: 0.557127 - Total Loss: 0.558965
+Step 4900/5000 - Recon Loss: 0.440726 - KL Loss: 1850.363281 - NLL Loss: 0.440726 - Total Loss: 0.442576
+Step 4950/5000 - Recon Loss: 0.558557 - KL Loss: 1863.030762 - NLL Loss: 0.558557 - Total Loss: 0.560420
+Step 5000/5000 - Recon Loss: 0.580176 - KL Loss: 1838.261475 - NLL Loss: 0.580176 - Total Loss: 0.582015
+Traceback (most recent call last):
+  File "c:\Users\ming\Desktop\LDM-Reproduce\scripts\train_VAE _demo.py", line 115, in <module>
+    'val/total_loss': avg_val_loss,
+                      ^^^^^^^^^^^^
+NameError: name 'avg_val_loss' is not defined
