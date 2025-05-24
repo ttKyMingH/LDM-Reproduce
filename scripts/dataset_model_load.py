@@ -15,5 +15,6 @@ os.makedirs(download_dir, exist_ok=True)  # 确保目录存在
 ds = load_dataset(cfg_data.dataset.name, cache_dir=download_dir)
 
 # 下载预训练模型
-embedder = ContextEmbedder(**cfg_model.model.ldm.context_embedder)
+embedder = ContextEmbedder(**cfg_model.model.ldm.context_embedder_path)
+
 loss = LossWithLPIPS()
